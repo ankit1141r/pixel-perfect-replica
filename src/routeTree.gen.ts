@@ -11,6 +11,9 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppRouteImport } from './routes/app'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as SignupRouteImport } from './routes/signup'
+import { Route as AppIndexRouteImport } from './routes/app/index'
 import { Route as AppMatchesRouteImport } from './routes/app/matches'
 import { Route as AppPlayersRouteImport } from './routes/app/players'
 import { Route as AppProfileRouteImport } from './routes/app/profile'
@@ -29,6 +32,21 @@ const AppRoute = AppRouteImport.update({
   id: '/app',
   path: '/app',
   getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppIndexRoute = AppIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppMatchesRoute = AppMatchesRouteImport.update({
   id: '/matches',
@@ -74,6 +92,8 @@ const AppTeamsRoute = AppTeamsRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
+  '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
   '/app/matches': typeof AppMatchesRoute
   '/app/players': typeof AppPlayersRoute
   '/app/profile': typeof AppProfileRoute
@@ -82,10 +102,12 @@ export interface FileRoutesByFullPath {
   '/app/scoreboard': typeof AppScoreboardRoute
   '/app/sports': typeof AppSportsRoute
   '/app/teams': typeof AppTeamsRoute
+  '/app/': typeof AppIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/app': typeof AppRouteWithChildren
+  '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
   '/app/matches': typeof AppMatchesRoute
   '/app/players': typeof AppPlayersRoute
   '/app/profile': typeof AppProfileRoute
@@ -94,11 +116,14 @@ export interface FileRoutesByTo {
   '/app/scoreboard': typeof AppScoreboardRoute
   '/app/sports': typeof AppSportsRoute
   '/app/teams': typeof AppTeamsRoute
+  '/app': typeof AppIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
+  '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
   '/app/matches': typeof AppMatchesRoute
   '/app/players': typeof AppPlayersRoute
   '/app/profile': typeof AppProfileRoute
@@ -107,12 +132,15 @@ export interface FileRoutesById {
   '/app/scoreboard': typeof AppScoreboardRoute
   '/app/sports': typeof AppSportsRoute
   '/app/teams': typeof AppTeamsRoute
+  '/app/': typeof AppIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/app'
+    | '/login'
+    | '/signup'
     | '/app/matches'
     | '/app/players'
     | '/app/profile'
@@ -121,10 +149,12 @@ export interface FileRouteTypes {
     | '/app/scoreboard'
     | '/app/sports'
     | '/app/teams'
+    | '/app/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/app'
+    | '/login'
+    | '/signup'
     | '/app/matches'
     | '/app/players'
     | '/app/profile'
@@ -133,10 +163,13 @@ export interface FileRouteTypes {
     | '/app/scoreboard'
     | '/app/sports'
     | '/app/teams'
+    | '/app'
   id:
     | '__root__'
     | '/'
     | '/app'
+    | '/login'
+    | '/signup'
     | '/app/matches'
     | '/app/players'
     | '/app/profile'
@@ -145,11 +178,14 @@ export interface FileRouteTypes {
     | '/app/scoreboard'
     | '/app/sports'
     | '/app/teams'
+    | '/app/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
+  LoginRoute: typeof LoginRoute
+  SignupRoute: typeof SignupRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -167,6 +203,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/app'
       preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/': {
+      id: '/app/'
+      path: '/'
+      fullPath: '/app/'
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
     }
     '/app/matches': {
       id: '/app/matches'
@@ -236,6 +293,7 @@ interface AppRouteChildren {
   AppScoreboardRoute: typeof AppScoreboardRoute
   AppSportsRoute: typeof AppSportsRoute
   AppTeamsRoute: typeof AppTeamsRoute
+  AppIndexRoute: typeof AppIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -247,6 +305,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppScoreboardRoute: AppScoreboardRoute,
   AppSportsRoute: AppSportsRoute,
   AppTeamsRoute: AppTeamsRoute,
+  AppIndexRoute: AppIndexRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
@@ -254,6 +313,8 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
+  LoginRoute: LoginRoute,
+  SignupRoute: SignupRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
