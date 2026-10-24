@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { UserCog } from "lucide-react";
 import { PageHeader, EmptyState } from "@/components/sporty/PageShell";
 
-export const Route = createFileRoute("/app/profile")({
+export const Route = createFileRoute("/_authenticated/app/profile")({
   head: () => ({ meta: [{ title: "Profile — SPORTY" }, { name: "description", content: "Your account details." }, { property: "og:title", content: "Profile — SPORTY" }, { property: "og:description", content: "Your account details." }] }),
   component: () => (
     <>

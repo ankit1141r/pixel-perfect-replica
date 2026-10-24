@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/sporty/Logo";
 import { navItems } from "@/components/sporty/nav";
 
-export const Route = createFileRoute("/app")({
+export const Route = createFileRoute("/_authenticated/app")({
   head: () => ({ meta: [{ title: "SPORTY — Dashboard" }] }),
   component: AppLayout,
 });
