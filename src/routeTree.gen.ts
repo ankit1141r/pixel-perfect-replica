@@ -10,27 +10,22 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AppRouteImport } from './routes/app'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as SignupRouteImport } from './routes/signup'
-import { Route as AppIndexRouteImport } from './routes/app/index'
-import { Route as AppMatchesRouteImport } from './routes/app/matches'
-import { Route as AppPlayersRouteImport } from './routes/app/players'
-import { Route as AppProfileRouteImport } from './routes/app/profile'
-import { Route as AppRegistrationsRouteImport } from './routes/app/registrations'
-import { Route as AppReportsRouteImport } from './routes/app/reports'
-import { Route as AppScoreboardRouteImport } from './routes/app/scoreboard'
-import { Route as AppSportsRouteImport } from './routes/app/sports'
-import { Route as AppTeamsRouteImport } from './routes/app/teams'
+import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
+import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app/index'
+import { Route as AuthenticatedAppMatchesRouteImport } from './routes/_authenticated/app/matches'
+import { Route as AuthenticatedAppPlayersRouteImport } from './routes/_authenticated/app/players'
+import { Route as AuthenticatedAppProfileRouteImport } from './routes/_authenticated/app/profile'
+import { Route as AuthenticatedAppRegistrationsRouteImport } from './routes/_authenticated/app/registrations'
+import { Route as AuthenticatedAppReportsRouteImport } from './routes/_authenticated/app/reports'
+import { Route as AuthenticatedAppScoreboardRouteImport } from './routes/_authenticated/app/scoreboard'
+import { Route as AuthenticatedAppSportsRouteImport } from './routes/_authenticated/app/sports'
+import { Route as AuthenticatedAppTeamsRouteImport } from './routes/_authenticated/app/teams'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppRoute = AppRouteImport.update({
-  id: '/app',
-  path: '/app',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -43,104 +38,111 @@ const SignupRoute = SignupRouteImport.update({
   path: '/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AppIndexRoute = AppIndexRouteImport.update({
+const AuthenticatedAppRoute = AuthenticatedAppRouteImport.update({
+  id: '/_authenticated/app',
+  path: '/app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAppIndexRoute = AuthenticatedAppIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => AppRoute,
+  getParentRoute: () => AuthenticatedAppRoute,
 } as any)
-const AppMatchesRoute = AppMatchesRouteImport.update({
+const AuthenticatedAppMatchesRoute = AuthenticatedAppMatchesRouteImport.update({
   id: '/matches',
   path: '/matches',
-  getParentRoute: () => AppRoute,
+  getParentRoute: () => AuthenticatedAppRoute,
 } as any)
-const AppPlayersRoute = AppPlayersRouteImport.update({
+const AuthenticatedAppPlayersRoute = AuthenticatedAppPlayersRouteImport.update({
   id: '/players',
   path: '/players',
-  getParentRoute: () => AppRoute,
+  getParentRoute: () => AuthenticatedAppRoute,
 } as any)
-const AppProfileRoute = AppProfileRouteImport.update({
+const AuthenticatedAppProfileRoute = AuthenticatedAppProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
-  getParentRoute: () => AppRoute,
+  getParentRoute: () => AuthenticatedAppRoute,
 } as any)
-const AppRegistrationsRoute = AppRegistrationsRouteImport.update({
-  id: '/registrations',
-  path: '/registrations',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppReportsRoute = AppReportsRouteImport.update({
+const AuthenticatedAppRegistrationsRoute =
+  AuthenticatedAppRegistrationsRouteImport.update({
+    id: '/registrations',
+    path: '/registrations',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppReportsRoute = AuthenticatedAppReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
-  getParentRoute: () => AppRoute,
+  getParentRoute: () => AuthenticatedAppRoute,
 } as any)
-const AppScoreboardRoute = AppScoreboardRouteImport.update({
-  id: '/scoreboard',
-  path: '/scoreboard',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppSportsRoute = AppSportsRouteImport.update({
+const AuthenticatedAppScoreboardRoute =
+  AuthenticatedAppScoreboardRouteImport.update({
+    id: '/scoreboard',
+    path: '/scoreboard',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppSportsRoute = AuthenticatedAppSportsRouteImport.update({
   id: '/sports',
   path: '/sports',
-  getParentRoute: () => AppRoute,
+  getParentRoute: () => AuthenticatedAppRoute,
 } as any)
-const AppTeamsRoute = AppTeamsRouteImport.update({
+const AuthenticatedAppTeamsRoute = AuthenticatedAppTeamsRouteImport.update({
   id: '/teams',
   path: '/teams',
-  getParentRoute: () => AppRoute,
+  getParentRoute: () => AuthenticatedAppRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
-  '/app/matches': typeof AppMatchesRoute
-  '/app/players': typeof AppPlayersRoute
-  '/app/profile': typeof AppProfileRoute
-  '/app/registrations': typeof AppRegistrationsRoute
-  '/app/reports': typeof AppReportsRoute
-  '/app/scoreboard': typeof AppScoreboardRoute
-  '/app/sports': typeof AppSportsRoute
-  '/app/teams': typeof AppTeamsRoute
-  '/app/': typeof AppIndexRoute
+  '/app': typeof AuthenticatedAppRouteWithChildren
+  '/app/matches': typeof AuthenticatedAppMatchesRoute
+  '/app/players': typeof AuthenticatedAppPlayersRoute
+  '/app/profile': typeof AuthenticatedAppProfileRoute
+  '/app/registrations': typeof AuthenticatedAppRegistrationsRoute
+  '/app/reports': typeof AuthenticatedAppReportsRoute
+  '/app/scoreboard': typeof AuthenticatedAppScoreboardRoute
+  '/app/sports': typeof AuthenticatedAppSportsRoute
+  '/app/teams': typeof AuthenticatedAppTeamsRoute
+  '/app/': typeof AuthenticatedAppIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
-  '/app/matches': typeof AppMatchesRoute
-  '/app/players': typeof AppPlayersRoute
-  '/app/profile': typeof AppProfileRoute
-  '/app/registrations': typeof AppRegistrationsRoute
-  '/app/reports': typeof AppReportsRoute
-  '/app/scoreboard': typeof AppScoreboardRoute
-  '/app/sports': typeof AppSportsRoute
-  '/app/teams': typeof AppTeamsRoute
-  '/app': typeof AppIndexRoute
+  '/app/matches': typeof AuthenticatedAppMatchesRoute
+  '/app/players': typeof AuthenticatedAppPlayersRoute
+  '/app/profile': typeof AuthenticatedAppProfileRoute
+  '/app/registrations': typeof AuthenticatedAppRegistrationsRoute
+  '/app/reports': typeof AuthenticatedAppReportsRoute
+  '/app/scoreboard': typeof AuthenticatedAppScoreboardRoute
+  '/app/sports': typeof AuthenticatedAppSportsRoute
+  '/app/teams': typeof AuthenticatedAppTeamsRoute
+  '/app': typeof AuthenticatedAppIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
-  '/app/matches': typeof AppMatchesRoute
-  '/app/players': typeof AppPlayersRoute
-  '/app/profile': typeof AppProfileRoute
-  '/app/registrations': typeof AppRegistrationsRoute
-  '/app/reports': typeof AppReportsRoute
-  '/app/scoreboard': typeof AppScoreboardRoute
-  '/app/sports': typeof AppSportsRoute
-  '/app/teams': typeof AppTeamsRoute
-  '/app/': typeof AppIndexRoute
+  '/_authenticated/app': typeof AuthenticatedAppRouteWithChildren
+  '/_authenticated/app/matches': typeof AuthenticatedAppMatchesRoute
+  '/_authenticated/app/players': typeof AuthenticatedAppPlayersRoute
+  '/_authenticated/app/profile': typeof AuthenticatedAppProfileRoute
+  '/_authenticated/app/registrations': typeof AuthenticatedAppRegistrationsRoute
+  '/_authenticated/app/reports': typeof AuthenticatedAppReportsRoute
+  '/_authenticated/app/scoreboard': typeof AuthenticatedAppScoreboardRoute
+  '/_authenticated/app/sports': typeof AuthenticatedAppSportsRoute
+  '/_authenticated/app/teams': typeof AuthenticatedAppTeamsRoute
+  '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/app'
     | '/login'
     | '/signup'
+    | '/app'
     | '/app/matches'
     | '/app/players'
     | '/app/profile'
@@ -167,25 +169,25 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/app'
     | '/login'
     | '/signup'
-    | '/app/matches'
-    | '/app/players'
-    | '/app/profile'
-    | '/app/registrations'
-    | '/app/reports'
-    | '/app/scoreboard'
-    | '/app/sports'
-    | '/app/teams'
-    | '/app/'
+    | '/_authenticated/app'
+    | '/_authenticated/app/matches'
+    | '/_authenticated/app/players'
+    | '/_authenticated/app/profile'
+    | '/_authenticated/app/registrations'
+    | '/_authenticated/app/reports'
+    | '/_authenticated/app/scoreboard'
+    | '/_authenticated/app/sports'
+    | '/_authenticated/app/teams'
+    | '/_authenticated/app/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AppRoute: typeof AppRouteWithChildren
   LoginRoute: typeof LoginRoute
   SignupRoute: typeof SignupRoute
+  AuthenticatedAppRoute: typeof AuthenticatedAppRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -195,13 +197,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/app': {
-      id: '/app'
-      path: '/app'
-      fullPath: '/app'
-      preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -218,103 +213,111 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignupRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/app/': {
-      id: '/app/'
+    '/_authenticated/app': {
+      id: '/_authenticated/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AuthenticatedAppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/app/': {
+      id: '/_authenticated/app/'
       path: '/'
       fullPath: '/app/'
-      preLoaderRoute: typeof AppIndexRouteImport
-      parentRoute: typeof AppRoute
+      preLoaderRoute: typeof AuthenticatedAppIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
-    '/app/matches': {
-      id: '/app/matches'
+    '/_authenticated/app/matches': {
+      id: '/_authenticated/app/matches'
       path: '/matches'
       fullPath: '/app/matches'
-      preLoaderRoute: typeof AppMatchesRouteImport
-      parentRoute: typeof AppRoute
+      preLoaderRoute: typeof AuthenticatedAppMatchesRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
-    '/app/players': {
-      id: '/app/players'
+    '/_authenticated/app/players': {
+      id: '/_authenticated/app/players'
       path: '/players'
       fullPath: '/app/players'
-      preLoaderRoute: typeof AppPlayersRouteImport
-      parentRoute: typeof AppRoute
+      preLoaderRoute: typeof AuthenticatedAppPlayersRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
-    '/app/profile': {
-      id: '/app/profile'
+    '/_authenticated/app/profile': {
+      id: '/_authenticated/app/profile'
       path: '/profile'
       fullPath: '/app/profile'
-      preLoaderRoute: typeof AppProfileRouteImport
-      parentRoute: typeof AppRoute
+      preLoaderRoute: typeof AuthenticatedAppProfileRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
-    '/app/registrations': {
-      id: '/app/registrations'
+    '/_authenticated/app/registrations': {
+      id: '/_authenticated/app/registrations'
       path: '/registrations'
       fullPath: '/app/registrations'
-      preLoaderRoute: typeof AppRegistrationsRouteImport
-      parentRoute: typeof AppRoute
+      preLoaderRoute: typeof AuthenticatedAppRegistrationsRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
-    '/app/reports': {
-      id: '/app/reports'
+    '/_authenticated/app/reports': {
+      id: '/_authenticated/app/reports'
       path: '/reports'
       fullPath: '/app/reports'
-      preLoaderRoute: typeof AppReportsRouteImport
-      parentRoute: typeof AppRoute
+      preLoaderRoute: typeof AuthenticatedAppReportsRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
-    '/app/scoreboard': {
-      id: '/app/scoreboard'
+    '/_authenticated/app/scoreboard': {
+      id: '/_authenticated/app/scoreboard'
       path: '/scoreboard'
       fullPath: '/app/scoreboard'
-      preLoaderRoute: typeof AppScoreboardRouteImport
-      parentRoute: typeof AppRoute
+      preLoaderRoute: typeof AuthenticatedAppScoreboardRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
-    '/app/sports': {
-      id: '/app/sports'
+    '/_authenticated/app/sports': {
+      id: '/_authenticated/app/sports'
       path: '/sports'
       fullPath: '/app/sports'
-      preLoaderRoute: typeof AppSportsRouteImport
-      parentRoute: typeof AppRoute
+      preLoaderRoute: typeof AuthenticatedAppSportsRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
-    '/app/teams': {
-      id: '/app/teams'
+    '/_authenticated/app/teams': {
+      id: '/_authenticated/app/teams'
       path: '/teams'
       fullPath: '/app/teams'
-      preLoaderRoute: typeof AppTeamsRouteImport
-      parentRoute: typeof AppRoute
+      preLoaderRoute: typeof AuthenticatedAppTeamsRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
   }
 }
 
-interface AppRouteChildren {
-  AppMatchesRoute: typeof AppMatchesRoute
-  AppPlayersRoute: typeof AppPlayersRoute
-  AppProfileRoute: typeof AppProfileRoute
-  AppRegistrationsRoute: typeof AppRegistrationsRoute
-  AppReportsRoute: typeof AppReportsRoute
-  AppScoreboardRoute: typeof AppScoreboardRoute
-  AppSportsRoute: typeof AppSportsRoute
-  AppTeamsRoute: typeof AppTeamsRoute
-  AppIndexRoute: typeof AppIndexRoute
+interface AuthenticatedAppRouteChildren {
+  AuthenticatedAppMatchesRoute: typeof AuthenticatedAppMatchesRoute
+  AuthenticatedAppPlayersRoute: typeof AuthenticatedAppPlayersRoute
+  AuthenticatedAppProfileRoute: typeof AuthenticatedAppProfileRoute
+  AuthenticatedAppRegistrationsRoute: typeof AuthenticatedAppRegistrationsRoute
+  AuthenticatedAppReportsRoute: typeof AuthenticatedAppReportsRoute
+  AuthenticatedAppScoreboardRoute: typeof AuthenticatedAppScoreboardRoute
+  AuthenticatedAppSportsRoute: typeof AuthenticatedAppSportsRoute
+  AuthenticatedAppTeamsRoute: typeof AuthenticatedAppTeamsRoute
+  AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
 }
 
-const AppRouteChildren: AppRouteChildren = {
-  AppMatchesRoute: AppMatchesRoute,
-  AppPlayersRoute: AppPlayersRoute,
-  AppProfileRoute: AppProfileRoute,
-  AppRegistrationsRoute: AppRegistrationsRoute,
-  AppReportsRoute: AppReportsRoute,
-  AppScoreboardRoute: AppScoreboardRoute,
-  AppSportsRoute: AppSportsRoute,
-  AppTeamsRoute: AppTeamsRoute,
-  AppIndexRoute: AppIndexRoute,
+const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
+  AuthenticatedAppMatchesRoute: AuthenticatedAppMatchesRoute,
+  AuthenticatedAppPlayersRoute: AuthenticatedAppPlayersRoute,
+  AuthenticatedAppProfileRoute: AuthenticatedAppProfileRoute,
+  AuthenticatedAppRegistrationsRoute: AuthenticatedAppRegistrationsRoute,
+  AuthenticatedAppReportsRoute: AuthenticatedAppReportsRoute,
+  AuthenticatedAppScoreboardRoute: AuthenticatedAppScoreboardRoute,
+  AuthenticatedAppSportsRoute: AuthenticatedAppSportsRoute,
+  AuthenticatedAppTeamsRoute: AuthenticatedAppTeamsRoute,
+  AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,
 }
 
-const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+const AuthenticatedAppRouteWithChildren =
+  AuthenticatedAppRoute._addFileChildren(AuthenticatedAppRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AppRoute: AppRouteWithChildren,
   LoginRoute: LoginRoute,
   SignupRoute: SignupRoute,
+  AuthenticatedAppRoute: AuthenticatedAppRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
