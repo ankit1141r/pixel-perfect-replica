@@ -1,7 +1,15 @@
 import type { ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
 
-export function PageHeader({ title, subtitle, action }: { title: string; subtitle?: string; action?: ReactNode }) {
+export function PageHeader({
+  title,
+  subtitle,
+  action,
+}: {
+  title: string;
+  subtitle?: string;
+  action?: ReactNode;
+}) {
   return (
     <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
       <div>
@@ -13,7 +21,15 @@ export function PageHeader({ title, subtitle, action }: { title: string; subtitl
   );
 }
 
-export function EmptyState({ icon: Icon, title, text }: { icon: LucideIcon; title: string; text: string }) {
+export function EmptyState({
+  icon: Icon,
+  title,
+  text,
+}: {
+  icon: LucideIcon;
+  title: string;
+  text: string;
+}) {
   return (
     <div className="flex flex-col items-center rounded-xl border border-dashed bg-card/40 px-6 py-16 text-center">
       <div className="mb-4 grid h-12 w-12 place-items-center rounded-full bg-primary/10 text-primary">
@@ -25,7 +41,15 @@ export function EmptyState({ icon: Icon, title, text }: { icon: LucideIcon; titl
   );
 }
 
-export function StatCard({ label, value, icon: Icon }: { label: string; value: string; icon: LucideIcon }) {
+export function StatCard({
+  label,
+  value,
+  icon: Icon,
+}: {
+  label: string;
+  value: string;
+  icon: LucideIcon;
+}) {
   return (
     <div className="rounded-xl border bg-card p-5">
       <div className="flex items-center justify-between text-sm text-muted-foreground">

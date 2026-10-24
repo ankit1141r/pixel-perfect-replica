@@ -12,7 +12,14 @@ import { useMe, type Me } from "@/lib/auth";
 import { profileSchema } from "@/lib/validation";
 
 export const Route = createFileRoute("/_authenticated/app/profile")({
-  head: () => ({ meta: [{ title: "Profile — SPORTY" }, { name: "description", content: "Your account details." }, { property: "og:title", content: "Profile — SPORTY" }, { property: "og:description", content: "Your account details." }] }),
+  head: () => ({
+    meta: [
+      { title: "Profile — SPORTY" },
+      { name: "description", content: "Your account details." },
+      { property: "og:title", content: "Profile — SPORTY" },
+      { property: "og:description", content: "Your account details." },
+    ],
+  }),
   component: Profile,
 });
 
@@ -34,10 +41,16 @@ function ProfileForm({ me }: { me: Me }) {
   const [err, setErr] = useState<string | null>(null);
   const save = useMutation({
     mutationFn: async (fullName: string) => {
-      const { error } = await supabase.from("profiles").update({ full_name: fullName, updated_at: new Date().toISOString() }).eq("id", me.id);
+      const { error } = await supabase
+        .from("profiles")
+        .update({ full_name: fullName, updated_at: new Date().toISOString() })
+        .eq("id", me.id);
       if (error) throw error;
     },
-    onSuccess: () => { toast.success("Profile saved"); qc.invalidateQueries({ queryKey: ["me"] }); },
+    onSuccess: () => {
+      toast.success("Profile saved");
+      qc.invalidateQueries({ queryKey: ["me"] });
+    },
     onError: (e: Error) => toast.error(e.message),
   });
 
@@ -47,14 +60,22 @@ function ProfileForm({ me }: { me: Me }) {
       onSubmit={(e) => {
         e.preventDefault();
         const p = profileSchema.safeParse({ fullName: name });
-        if (!p.success) return setErr(p.error.issues[0].message);
+        if (!p.success) {
+          setErr(p.error.issues[0]?.message ?? "Invalid name");
+          return;
+        }
         setErr(null);
         save.mutate(p.data.fullName);
       }}
     >
       <div className="space-y-2">
         <Label htmlFor="fullName">Full name</Label>
-        <Input id="fullName" value={name} onChange={(e) => setName(e.target.value)} aria-invalid={!!err} />
+        <Input
+          id="fullName"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          aria-invalid={!!err}
+        />
         {err && <p className="text-sm text-destructive">{err}</p>}
       </div>
       <div className="space-y-2">
@@ -62,9 +83,14 @@ function ProfileForm({ me }: { me: Me }) {
         <Input id="email" value={me.email} disabled />
       </div>
       <div className="text-sm text-muted-foreground">
-        Role: <span className="font-semibold text-primary">{me.isAdmin ? "Administrator" : "Player"}</span>
+        Role:{" "}
+        <span className="font-semibold text-primary">
+          {me.isAdmin ? "Administrator" : "Player"}
+        </span>
       </div>
-      <Button type="submit" disabled={save.isPending}>{save.isPending ? "Saving…" : "Save changes"}</Button>
+      <Button type="submit" disabled={save.isPending}>
+        {save.isPending ? "Saving…" : "Save changes"}
+      </Button>
     </form>
   );
 }

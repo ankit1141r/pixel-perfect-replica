@@ -18,7 +18,10 @@ export const Route = createFileRoute("/login")({
       { title: "Sign in — SPORTY" },
       { name: "description", content: "Sign in to manage your teams, fixtures and registrations." },
       { property: "og:title", content: "Sign in — SPORTY" },
-      { property: "og:description", content: "Sign in to manage your teams, fixtures and registrations." },
+      {
+        property: "og:description",
+        content: "Sign in to manage your teams, fixtures and registrations.",
+      },
     ],
   }),
   component: Login,
@@ -43,7 +46,10 @@ function Login() {
     setBusy(true);
     const { error } = await supabase.auth.signInWithPassword(parsed.data);
     setBusy(false);
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     await qc.invalidateQueries({ queryKey: ["me"] });
     navigate({ to: safeRedirect(redirect) });
   }
@@ -52,20 +58,41 @@ function Login() {
     <AuthCard
       title="Welcome back"
       subtitle="Sign in to your SPORTY account."
-      footer={<>New player? <Link to="/signup" className="text-primary hover:underline">Create an account</Link></>}
+      footer={
+        <>
+          New player?{" "}
+          <Link to="/signup" className="text-primary hover:underline">
+            Create an account
+          </Link>
+        </>
+      }
     >
       <form className="space-y-4" onSubmit={onSubmit} noValidate>
         <div className="space-y-2">
           <Label htmlFor="email">Email</Label>
-          <Input id="email" name="email" type="email" autoComplete="email" aria-invalid={!!errors.email} />
-          {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
+          <Input
+            id="email"
+            name="email"
+            type="email"
+            autoComplete="email"
+            aria-invalid={!!errors["email"]}
+          />
+          {errors["email"] && <p className="text-sm text-destructive">{errors["email"]}</p>}
         </div>
         <div className="space-y-2">
           <Label htmlFor="password">Password</Label>
-          <Input id="password" name="password" type="password" autoComplete="current-password" aria-invalid={!!errors.password} />
-          {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
+          <Input
+            id="password"
+            name="password"
+            type="password"
+            autoComplete="current-password"
+            aria-invalid={!!errors["password"]}
+          />
+          {errors["password"] && <p className="text-sm text-destructive">{errors["password"]}</p>}
         </div>
-        <Button type="submit" className="w-full" disabled={busy}>{busy ? "Signing in…" : "Sign in"}</Button>
+        <Button type="submit" className="w-full" disabled={busy}>
+          {busy ? "Signing in…" : "Sign in"}
+        </Button>
       </form>
     </AuthCard>
   );

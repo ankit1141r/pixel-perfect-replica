@@ -13,9 +13,15 @@ export const Route = createFileRoute("/signup")({
   head: () => ({
     meta: [
       { title: "Join as a player — SPORTY" },
-      { name: "description", content: "Create your SPORTY player account and register for sports." },
+      {
+        name: "description",
+        content: "Create your SPORTY player account and register for sports.",
+      },
       { property: "og:title", content: "Join as a player — SPORTY" },
-      { property: "og:description", content: "Create your SPORTY player account and register for sports." },
+      {
+        property: "og:description",
+        content: "Create your SPORTY player account and register for sports.",
+      },
     ],
   }),
   component: Signup,
@@ -29,7 +35,11 @@ function Signup() {
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
-    const parsed = signupSchema.safeParse({ fullName: fd.get("fullName"), email: fd.get("email"), password: fd.get("password") });
+    const parsed = signupSchema.safeParse({
+      fullName: fd.get("fullName"),
+      email: fd.get("email"),
+      password: fd.get("password"),
+    });
     if (!parsed.success) {
       setErrors(Object.fromEntries(parsed.error.issues.map((i) => [i.path[0], i.message])));
       return;
@@ -40,19 +50,34 @@ function Signup() {
     const { data, error } = await supabase.auth.signUp({
       email: parsed.data.email,
       password: parsed.data.password,
-      options: { emailRedirectTo: `${window.location.origin}/app`, data: { full_name: parsed.data.fullName } },
+      options: {
+        emailRedirectTo: `${window.location.origin}/app`,
+        data: { full_name: parsed.data.fullName },
+      },
     });
     setBusy(false);
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     if (data.session) window.location.assign("/app");
     else setSentTo(parsed.data.email);
   }
 
   if (sentTo) {
     return (
-      <AuthCard title="Check your email" subtitle={`We sent a confirmation link to ${sentTo}.`} footer={<Link to="/login" className="text-primary hover:underline">Back to sign in</Link>}>
+      <AuthCard
+        title="Check your email"
+        subtitle={`We sent a confirmation link to ${sentTo}.`}
+        footer={
+          <Link to="/login" className="text-primary hover:underline">
+            Back to sign in
+          </Link>
+        }
+      >
         <div className="flex items-center gap-3 rounded-lg border bg-surface p-4 text-sm text-muted-foreground">
-          <MailCheck className="h-5 w-5 text-primary" /> Click the link to activate your player account.
+          <MailCheck className="h-5 w-5 text-primary" /> Click the link to activate your player
+          account.
         </div>
       </AuthCard>
     );
@@ -70,13 +95,22 @@ function Signup() {
     <AuthCard
       title="Join the club"
       subtitle="Create your player account."
-      footer={<>Already registered? <Link to="/login" className="text-primary hover:underline">Sign in</Link></>}
+      footer={
+        <>
+          Already registered?{" "}
+          <Link to="/login" className="text-primary hover:underline">
+            Sign in
+          </Link>
+        </>
+      }
     >
       <form className="space-y-4" onSubmit={onSubmit} noValidate>
         {field("fullName", "Full name", "text", "name")}
         {field("email", "Email", "email", "email")}
         {field("password", "Password", "password", "new-password")}
-        <Button type="submit" className="w-full" disabled={busy}>{busy ? "Creating…" : "Create account"}</Button>
+        <Button type="submit" className="w-full" disabled={busy}>
+          {busy ? "Creating…" : "Create account"}
+        </Button>
       </form>
     </AuthCard>
   );

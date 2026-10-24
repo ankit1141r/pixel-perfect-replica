@@ -4,10 +4,17 @@ import { safeRedirect } from "@/lib/auth";
 
 describe("signup rules", () => {
   it("rejects passwords shorter than 8 characters", () => {
-    expect(signupSchema.safeParse({ fullName: "A", email: "a@b.co", password: "1234567" }).success).toBe(false);
+    expect(
+      signupSchema.safeParse({ fullName: "A", email: "a@b.co", password: "1234567" }).success,
+    ).toBe(false);
   });
   it("ignores any role field sent with signup", () => {
-    const r = signupSchema.parse({ fullName: "A", email: "a@b.co", password: "12345678", role: "admin" } as never);
+    const r = signupSchema.parse({
+      fullName: "A",
+      email: "a@b.co",
+      password: "12345678",
+      role: "admin",
+    } as never);
     expect("role" in r).toBe(false);
   });
 });

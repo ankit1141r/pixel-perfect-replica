@@ -1,4 +1,5 @@
 # SPORTY roadmap
+
 - [x] Stage 1: Dark UI, landing, sign-in/sign-up screens, app navigation
 - [ ] Stage 2: Lovable Cloud schema, auth, profiles, roles, RLS
 - [ ] Stage 3: Real admin & player dashboards

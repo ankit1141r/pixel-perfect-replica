@@ -15,7 +15,11 @@ export const meQuery = queryOptions({
     const { data: auth } = await supabase.auth.getUser();
     if (!auth.user) return null;
     const [profile, roles] = await Promise.all([
-      supabase.from("profiles").select("full_name, email, created_at").eq("id", auth.user.id).maybeSingle(),
+      supabase
+        .from("profiles")
+        .select("full_name, email, created_at")
+        .eq("id", auth.user.id)
+        .maybeSingle(),
       supabase.from("user_roles").select("role").eq("user_id", auth.user.id),
     ]);
     if (profile.error) throw profile.error;
@@ -34,6 +38,7 @@ export const useMe = () => useQuery(meQuery);
 
 /** Only allow same-origin relative paths as post-login destinations. */
 export function safeRedirect(target: unknown): string {
-  if (typeof target !== "string" || !target.startsWith("/") || target.startsWith("//")) return "/app";
+  if (typeof target !== "string" || !target.startsWith("/") || target.startsWith("//"))
+    return "/app";
   return target;
 }
