@@ -23,10 +23,18 @@ export async function triggerSheetsSync(options?: {
     });
 
     if (error) {
+      const isNotDeployed =
+        error.message?.includes("Failed to send a request") ||
+        error.message?.includes("404") ||
+        error.message?.includes("not found");
+      const friendlyMessage = isNotDeployed
+        ? "Google Sheets Edge Function ('sync-sheets') is not deployed to your Supabase project yet. Deploy it via Supabase CLI to enable synchronization."
+        : error.message || "Failed to call Google Sheets sync service.";
+
       return {
         configured: false,
         error: error.message,
-        message: error.message || "Failed to call Google Sheets sync service.",
+        message: friendlyMessage,
       };
     }
 
