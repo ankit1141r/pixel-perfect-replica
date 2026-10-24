@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Users, Trophy, Shield, CalendarDays, Activity } from "lucide-react";
 import { PageHeader, StatCard, EmptyState } from "@/components/sporty/PageShell";
 
-export const Route = createFileRoute("/app/")({
+export const Route = createFileRoute("/_authenticated/app/")({
   head: () => ({
     meta: [
       { title: "Dashboard — SPORTY" },

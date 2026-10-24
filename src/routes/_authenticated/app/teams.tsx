@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Shield } from "lucide-react";
 import { PageHeader, EmptyState } from "@/components/sporty/PageShell";
 
-export const Route = createFileRoute("/app/teams")({
+export const Route = createFileRoute("/_authenticated/app/teams")({
   head: () => ({ meta: [{ title: "Teams — SPORTY" }, { name: "description", content: "Squads across every sport." }, { property: "og:title", content: "Teams — SPORTY" }, { property: "og:description", content: "Squads across every sport." }] }),
   component: () => (
     <>
