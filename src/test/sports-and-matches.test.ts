@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { sportSchema, teamSchema, matchSchema } from "@/lib/validation";
+import { sportSchema, teamSchema, matchSchema, teamJoinRequestSchema } from "@/lib/validation";
 import { standings } from "@/lib/data";
 
 describe("Sports and Team Validation", () => {
@@ -14,6 +14,28 @@ describe("Sports and Team Validation", () => {
     expect(teamSchema.safeParse({ name: "Thunderbolts", sport_id: validUuid }).success).toBe(true);
     expect(teamSchema.safeParse({ name: "", sport_id: validUuid }).success).toBe(false);
     expect(teamSchema.safeParse({ name: "Warriors", sport_id: "not-a-uuid" }).success).toBe(false);
+  });
+
+  it("validates team join requests and optional message length", () => {
+    const validTeamId = "123e4567-e89b-12d3-a456-426614174000";
+    expect(teamJoinRequestSchema.safeParse({ team_id: validTeamId }).success).toBe(true);
+    expect(
+      teamJoinRequestSchema.safeParse({
+        team_id: validTeamId,
+        message: "I would love to join as striker.",
+      }).success,
+    ).toBe(true);
+    expect(
+      teamJoinRequestSchema.safeParse({
+        team_id: "not-a-uuid",
+      }).success,
+    ).toBe(false);
+    expect(
+      teamJoinRequestSchema.safeParse({
+        team_id: validTeamId,
+        message: "a".repeat(301),
+      }).success,
+    ).toBe(false);
   });
 });
 

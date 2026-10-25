@@ -92,6 +92,36 @@ export const myTeamsQuery = (userId: string) =>
       ),
   });
 
+export const teamJoinRequestsQuery = (teamId?: string) =>
+  queryOptions({
+    queryKey: teamId ? ["team-join-requests", teamId] : ["team-join-requests"],
+    queryFn: async () => {
+      let query = supabase
+        .from("team_join_requests")
+        .select(
+          "*, player:profiles(id, full_name, email), team:teams(id, name, sport:sports(id, name))",
+        )
+        .order("created_at", { ascending: false });
+      if (teamId) {
+        query = query.eq("team_id", teamId);
+      }
+      return must(await query);
+    },
+  });
+
+export const myTeamJoinRequestsQuery = (userId: string) =>
+  queryOptions({
+    queryKey: ["my-team-requests", userId],
+    queryFn: async () =>
+      must(
+        await supabase
+          .from("team_join_requests")
+          .select("*, team:teams(id, name, sport:sports(id, name))")
+          .eq("player_id", userId)
+          .order("created_at", { ascending: false }),
+      ),
+  });
+
 export const activityQuery = queryOptions({
   queryKey: ["activity"],
   queryFn: async () =>

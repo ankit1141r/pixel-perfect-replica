@@ -265,6 +265,51 @@ export type Database = {
           },
         ];
       };
+      team_join_requests: {
+        Row: {
+          created_at: string;
+          id: string;
+          message: string | null;
+          player_id: string;
+          status: Database["public"]["Enums"]["registration_status"];
+          team_id: string;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          id?: string;
+          message?: string | null;
+          player_id: string;
+          status?: Database["public"]["Enums"]["registration_status"];
+          team_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          message?: string | null;
+          player_id?: string;
+          status?: Database["public"]["Enums"]["registration_status"];
+          team_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "team_join_requests_player_id_fkey";
+            columns: ["player_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "team_join_requests_team_id_fkey";
+            columns: ["team_id"];
+            isOneToOne: false;
+            referencedRelation: "teams";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       teams: {
         Row: {
           created_at: string;
@@ -323,6 +368,18 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      approve_team_join_request: {
+        Args: {
+          _request_id: string;
+        };
+        Returns: undefined;
+      };
+      reject_team_join_request: {
+        Args: {
+          _request_id: string;
+        };
+        Returns: undefined;
+      };
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"];

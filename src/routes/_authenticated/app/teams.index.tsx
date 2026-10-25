@@ -3,9 +3,10 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
-import { Pencil, Plus, Search, Shield, Trash2 } from "lucide-react";
+import { ArrowRight, Clock, Pencil, Plus, Search, Shield, Trash2, UserCheck } from "lucide-react";
 import { PageHeader, EmptyState } from "@/components/sporty/PageShell";
 import { Confirm, ErrorBox, Loading, Pager, paginate } from "@/components/sporty/bits";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -17,7 +18,7 @@ import {
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useMe } from "@/lib/auth";
-import { sportsQuery, teamsQuery } from "@/lib/data";
+import { myTeamJoinRequestsQuery, myTeamsQuery, sportsQuery, teamsQuery } from "@/lib/data";
 import { TeamDialog } from "@/components/sporty/TeamDialog";
 
 export const Route = createFileRoute("/_authenticated/app/teams/")({
@@ -42,9 +43,17 @@ function Teams() {
   const qc = useQueryClient();
   const teams = useQuery(teamsQuery);
   const sports = useQuery(sportsQuery);
+  const myTeams = useQuery({ ...myTeamsQuery(me?.id ?? ""), enabled: !!me?.id });
+  const myRequests = useQuery({ ...myTeamJoinRequestsQuery(me?.id ?? ""), enabled: !!me?.id });
+
   const [q, setQ] = useState("");
   const [page, setPage] = useState(1);
   const [editing, setEditing] = useState<TeamEdit | "new" | null>(null);
+
+  const myTeamIdSet = new Set((myTeams.data ?? []).map((m) => m.team?.id));
+  const myPendingTeamIdSet = new Set(
+    (myRequests.data ?? []).filter((r) => r.status === "pending").map((r) => r.team?.id),
+  );
 
   const filtered = (teams.data ?? []).filter(
     (t) =>
@@ -125,49 +134,89 @@ function Teams() {
                   <th className="p-3 font-medium">Team</th>
                   <th className="p-3 font-medium">Sport</th>
                   <th className="p-3 font-medium">Players</th>
-                  <th className="p-3" />
+                  {!me?.isAdmin && <th className="p-3 font-medium">Your Status</th>}
+                  <th className="p-3 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y">
-                {pg.items.map((t) => (
-                  <tr key={t.id}>
-                    <td className="p-3">
-                      <Link
-                        to="/app/teams/$teamId"
-                        params={{ teamId: t.id }}
-                        className="font-medium hover:text-primary"
-                      >
-                        {t.name}
-                      </Link>
-                    </td>
-                    <td className="p-3 text-muted-foreground">{t.sport?.name}</td>
-                    <td className="p-3 tabular-nums">{t.team_members[0]?.count ?? 0}</td>
-                    <td className="p-3 text-right">
-                      {me?.isAdmin && (
-                        <>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            aria-label={`Edit ${t.name}`}
-                            onClick={() => setEditing(t)}
-                          >
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-                          <Confirm
-                            title={`Delete ${t.name}?`}
-                            text="Its members and matches are removed too."
-                            onConfirm={() => remove(t.id)}
-                            trigger={
-                              <Button variant="ghost" size="icon" aria-label={`Delete ${t.name}`}>
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            }
-                          />
-                        </>
+                {pg.items.map((t) => {
+                  const isMember = myTeamIdSet.has(t.id);
+                  const isPending = myPendingTeamIdSet.has(t.id);
+
+                  return (
+                    <tr key={t.id}>
+                      <td className="p-3">
+                        <Link
+                          to="/app/teams/$teamId"
+                          params={{ teamId: t.id }}
+                          className="font-medium hover:text-primary transition-colors"
+                        >
+                          {t.name}
+                        </Link>
+                      </td>
+                      <td className="p-3 text-muted-foreground">{t.sport?.name}</td>
+                      <td className="p-3 tabular-nums">{t.team_members[0]?.count ?? 0}</td>
+                      {!me?.isAdmin && (
+                        <td className="p-3">
+                          {isMember ? (
+                            <Badge className="border-primary/30 bg-primary/20 text-primary text-xs flex items-center w-fit gap-1">
+                              <UserCheck className="h-3 w-3" /> Member
+                            </Badge>
+                          ) : isPending ? (
+                            <Badge
+                              variant="outline"
+                              className="border-amber-500/40 bg-amber-500/10 text-amber-400 text-xs flex items-center w-fit gap-1"
+                            >
+                              <Clock className="h-3 w-3" /> Pending
+                            </Badge>
+                          ) : (
+                            <span className="text-xs text-muted-foreground">Not joined</span>
+                          )}
+                        </td>
                       )}
-                    </td>
-                  </tr>
-                ))}
+                      <td className="p-3 text-right">
+                        {me?.isAdmin ? (
+                          <div className="flex items-center justify-end gap-1">
+                            <Button
+                              asChild
+                              variant="ghost"
+                              size="icon"
+                              aria-label={`View ${t.name}`}
+                            >
+                              <Link to="/app/teams/$teamId" params={{ teamId: t.id }}>
+                                <ArrowRight className="h-4 w-4" />
+                              </Link>
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              aria-label={`Edit ${t.name}`}
+                              onClick={() => setEditing(t)}
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                            <Confirm
+                              title={`Delete ${t.name}?`}
+                              text="Its members and matches are removed too."
+                              onConfirm={() => remove(t.id)}
+                              trigger={
+                                <Button variant="ghost" size="icon" aria-label={`Delete ${t.name}`}>
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              }
+                            />
+                          </div>
+                        ) : (
+                          <Button asChild variant="outline" size="sm" className="h-8 text-xs">
+                            <Link to="/app/teams/$teamId" params={{ teamId: t.id }}>
+                              {isMember ? "View Team" : isPending ? "Check Status" : "Request Join"}
+                            </Link>
+                          </Button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

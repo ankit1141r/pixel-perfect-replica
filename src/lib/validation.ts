@@ -32,6 +32,11 @@ export const teamSchema = z.object({
   description: optionalText(500),
 });
 
+export const teamJoinRequestSchema = z.object({
+  team_id: z.string().uuid("Pick a team"),
+  message: optionalText(300),
+});
+
 const score = z
   .union([z.string().trim(), z.number(), z.null(), z.undefined()])
   .optional()
