@@ -2,6 +2,10 @@
   "buildCommand": "npm run build",
   "installCommand": "npm install --legacy-peer-deps",
   "env": {
-    "NITRO_PRESET": "vercel"
+    "NITRO_PRESET": "vercel",
+    "SUPABASE_URL": "https://jtawpnchteyhcjuqcvey.supabase.co",
+    "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_S2lbCAN3NaVHAZbmwgreug_xoNb1mOM",
+    "VITE_SUPABASE_URL": "https://jtawpnchteyhcjuqcvey.supabase.co",
+    "VITE_SUPABASE_PUBLISHABLE_KEY": "sb_publishable_S2lbCAN3NaVHAZbmwgreug_xoNb1mOM"
   }
 }

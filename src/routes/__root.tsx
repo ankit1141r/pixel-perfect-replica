@@ -44,6 +44,8 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
     reportLovableError(error, { boundary: "tanstack_root_error_component" });
   }, [error]);
 
+  const message = error instanceof Error ? error.message : typeof error === "string" ? error : "";
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
@@ -53,6 +55,11 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
         <p className="mt-2 text-sm text-muted-foreground">
           Something went wrong on our end. You can try refreshing or head back home.
         </p>
+        {message && (
+          <div className="mt-3 rounded-lg border border-destructive/30 bg-destructive/10 p-2.5 text-left font-mono text-xs text-destructive break-words">
+            {message}
+          </div>
+        )}
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
             onClick={() => {
@@ -124,12 +131,16 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
   useEffect(() => {
-    const { data } = supabase.auth.onAuthStateChange((event) => {
-      if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
-      router.invalidate();
-      if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
-    });
-    return () => data.subscription.unsubscribe();
+    try {
+      const { data } = supabase.auth.onAuthStateChange((event) => {
+        if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
+        router.invalidate();
+        if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
+      });
+      return () => data?.subscription?.unsubscribe?.();
+    } catch (err) {
+      console.warn("Failed to subscribe to auth state changes:", err);
+    }
   }, [router, queryClient]);
 
   return (

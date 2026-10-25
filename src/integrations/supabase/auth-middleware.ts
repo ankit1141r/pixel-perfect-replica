@@ -4,6 +4,9 @@ import { getRequest } from "@tanstack/react-start/server";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "./types";
 
+const DEFAULT_SUPABASE_URL = "https://jtawpnchteyhcjuqcvey.supabase.co";
+const DEFAULT_SUPABASE_PUBLISHABLE_KEY = "sb_publishable_S2lbCAN3NaVHAZbmwgreug_xoNb1mOM";
+
 function isNewSupabaseApiKey(value: string): boolean {
   return value.startsWith("sb_publishable_") || value.startsWith("sb_secret_");
 }
@@ -33,8 +36,14 @@ function createSupabaseFetch(supabaseKey: string): typeof fetch {
 
 export const requireSupabaseAuth = createMiddleware({ type: "function" }).server(
   async ({ next }) => {
-    const SUPABASE_URL = process.env["SUPABASE_URL"];
-    const SUPABASE_PUBLISHABLE_KEY = process.env["SUPABASE_PUBLISHABLE_KEY"];
+    const SUPABASE_URL =
+      process.env["SUPABASE_URL"] ||
+      process.env["VITE_SUPABASE_URL"] ||
+      DEFAULT_SUPABASE_URL;
+    const SUPABASE_PUBLISHABLE_KEY =
+      process.env["SUPABASE_PUBLISHABLE_KEY"] ||
+      process.env["VITE_SUPABASE_PUBLISHABLE_KEY"] ||
+      DEFAULT_SUPABASE_PUBLISHABLE_KEY;
 
     if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
       const missing = [
@@ -68,15 +77,12 @@ export const requireSupabaseAuth = createMiddleware({ type: "function" }).server
     }
 
     if (token.split(".").length !== 3) {
-      throw new Error("Unauthorized: Invalid token");
+      throw new Error("Unauthorized: Invalid token format");
     }
 
-    const supabase = createClient<Database>(SUPABASE_URL!, SUPABASE_PUBLISHABLE_KEY!, {
+    const client = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
       global: {
-        fetch: createSupabaseFetch(SUPABASE_PUBLISHABLE_KEY!),
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        fetch: createSupabaseFetch(SUPABASE_PUBLISHABLE_KEY),
       },
       auth: {
         storage: undefined,
@@ -85,20 +91,18 @@ export const requireSupabaseAuth = createMiddleware({ type: "function" }).server
       },
     });
 
-    const { data, error } = await supabase.auth.getClaims(token);
-    if (error || !data?.claims) {
-      throw new Error("Unauthorized: Invalid token");
-    }
+    const {
+      data: { user },
+      error,
+    } = await client.auth.getUser(token);
 
-    if (!data.claims.sub) {
-      throw new Error("Unauthorized: No user ID found in token");
+    if (error || !user) {
+      throw new Error("Unauthorized: Invalid token");
     }
 
     return next({
       context: {
-        supabase,
-        userId: data.claims.sub,
-        claims: data.claims,
+        user,
       },
     });
   },
