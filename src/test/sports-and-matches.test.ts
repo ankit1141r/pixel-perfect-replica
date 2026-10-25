@@ -117,9 +117,9 @@ describe("Standings Calculation", () => {
     // Lions: 1 win, 3 pts
     // Tigers: 1 loss, 1 draw, 1 pt
     // Bears: 1 draw, 1 pt
-    expect(result[0].team).toBe("Lions");
-    expect(result[0].pts).toBe(3);
-    expect(result[0].w).toBe(1);
+    expect(result[0]?.team).toBe("Lions");
+    expect(result[0]?.pts).toBe(3);
+    expect(result[0]?.w).toBe(1);
 
     const bears = result.find((r) => r.team === "Bears");
     expect(bears?.pts).toBe(1);

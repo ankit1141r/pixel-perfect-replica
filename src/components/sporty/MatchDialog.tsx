@@ -24,7 +24,7 @@ import { fieldErrors, matchSchema } from "@/lib/validation";
 
 const STATUSES: MatchStatus[] = ["scheduled", "live", "completed", "cancelled"];
 
-function Err({ m }: { m?: string }) {
+function Err({ m }: { m?: string | undefined }) {
   return m ? <p className="text-sm text-destructive">{m}</p> : null;
 }
 

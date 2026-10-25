@@ -33,7 +33,7 @@ export function TeamDialog({
   onClose,
 }: {
   team: TeamEdit | null;
-  defaultSport?: string;
+  defaultSport?: string | undefined;
   onClose: () => void;
 }) {
   const qc = useQueryClient();

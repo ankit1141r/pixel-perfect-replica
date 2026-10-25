@@ -30,10 +30,15 @@ export const teamsQuery = queryOptions({
 export const teamQuery = (id: string) =>
   queryOptions({
     queryKey: ["teams", id],
-    queryFn: async () =>
-      must(
-        await supabase.from("teams").select("*, sport:sports(id, name)").eq("id", id).maybeSingle(),
-      ),
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("teams")
+        .select("*, sport:sports(id, name)")
+        .eq("id", id)
+        .maybeSingle();
+      if (error) throw new Error(error.message);
+      return data;
+    },
   });
 
 export const rosterQuery = (teamId: string) =>

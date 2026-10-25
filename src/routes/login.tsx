@@ -44,7 +44,15 @@ function Login() {
     }
     setErrors({});
     setBusy(true);
-    const { error } = await supabase.auth.signInWithPassword(parsed.data);
+
+    const rawEmail = parsed.data.email.trim();
+    // Allow either username (e.g. ak1141 -> ak1141@sporty.com) or standard email
+    const formattedEmail = rawEmail.includes("@") ? rawEmail : `${rawEmail}@sporty.com`;
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email: formattedEmail,
+      password: parsed.data.password,
+    });
     setBusy(false);
     if (error) {
       toast.error(error.message);
@@ -69,12 +77,13 @@ function Login() {
     >
       <form className="space-y-4" onSubmit={onSubmit} noValidate>
         <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
+          <Label htmlFor="email">Email or Username</Label>
           <Input
             id="email"
             name="email"
-            type="email"
-            autoComplete="email"
+            type="text"
+            autoComplete="username"
+            placeholder="e.g. ak1141 or ak1141@sporty.com"
             aria-invalid={!!errors["email"]}
           />
           {errors["email"] && <p className="text-sm text-destructive">{errors["email"]}</p>}
@@ -86,6 +95,7 @@ function Login() {
             name="password"
             type="password"
             autoComplete="current-password"
+            placeholder="••••••••"
             aria-invalid={!!errors["password"]}
           />
           {errors["password"] && <p className="text-sm text-destructive">{errors["password"]}</p>}

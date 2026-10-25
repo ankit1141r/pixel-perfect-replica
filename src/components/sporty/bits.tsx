@@ -24,7 +24,7 @@ export function Confirm({
   label = "Delete",
 }: {
   trigger: ReactNode;
-  title: string;
+  title: ReactNode;
   text: string;
   onConfirm: () => Promise<unknown> | void;
   label?: string;
@@ -122,7 +122,7 @@ export function Card({
   action,
   children,
 }: {
-  title: string;
+  title: ReactNode;
   action?: ReactNode;
   children: ReactNode;
 }) {
