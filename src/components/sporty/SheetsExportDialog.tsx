@@ -200,13 +200,14 @@ export function SheetsExportDialog({ trigger }: { trigger?: React.ReactNode }) {
   ]);
 
   function downloadAllCSVs() {
+    window.open(`${LIVE_ORIGIN}/exports/all_data.csv`, "_blank");
     triggerDownload(toCsvString(playersHeaders, playersRows), "sporty_players.csv");
     triggerDownload(toCsvString(teamsHeaders, teamsRows), "sporty_teams.csv");
     triggerDownload(toCsvString(membersHeaders, membersRows), "sporty_team_members.csv");
     triggerDownload(toCsvString(regsHeaders, regsRows), "sporty_registrations.csv");
     triggerDownload(toCsvString(reqsHeaders, reqsRows), "sporty_team_join_requests.csv");
     triggerDownload(toCsvString(sportsHeaders, sportsRows), "sporty_sports.csv");
-    toast.success("Downloaded all 6 CSV files for Google Sheets!");
+    toast.success("Downloaded all CSV files including sporty_all_data.csv!");
   }
 
   return (
@@ -313,6 +314,12 @@ export function SheetsExportDialog({ trigger }: { trigger?: React.ReactNode }) {
 
                   <div className="mt-3 space-y-2">
                     {[
+                      {
+                        name: "All Project Data (Everything in 1 Sheet)",
+                        formula: `=IMPORTDATA("${LIVE_ORIGIN}/exports/all_data.csv")`,
+                        key: "f-all",
+                        highlight: true,
+                      },
                       {
                         name: "Players Tab",
                         formula: `=IMPORTDATA("${LIVE_ORIGIN}/exports/players.csv")`,

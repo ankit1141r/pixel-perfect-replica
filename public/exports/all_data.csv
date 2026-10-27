@@ -1,0 +1,35 @@
+=== SPORTY MASTER DATA EXPORT ===
+Exported At,2026-10-27T12:10:51.125Z
+
+--- 1. PLAYERS ---
+Player ID,Full Name,Email,Role,Registered At
+b9a9c415-007c-4472-bce7-7c5c9cbe1d35,Riyanshu Jadhav,riyanshujadhav864@gmail.com,player,2026-10-27T11:29:45.681162+00:00
+f4fc229a-b573-4426-bbe9-3c698bc8d990,Devraj Mewada,devrajmewada80@gmail.com,player,2026-10-24T23:17:21.452865+00:00
+cf873809-4c5f-4544-a353-b64cec576da1,ak1141,ak1141@sporty.com,"player, admin",2026-10-24T23:12:20.01767+00:00
+
+--- 2. TEAMS ---
+Team ID,Team Name,Sport,Created At
+7ccb5d1d-e0f6-4836-8f9e-4041e4c61c47,money_heist,Cricket,2026-10-25T03:50:38.137888+00:00
+
+--- 3. TEAM MEMBERS & ROSTERS ---
+Team Name,Sport,Player Name,Player Email,Player ID,Joined At
+money_heist,Cricket,ak1141,ak1141@sporty.com,cf873809-4c5f-4544-a353-b64cec576da1,2026-10-25T20:18:44.416218+00:00
+money_heist,Cricket,Devraj Mewada,devrajmewada80@gmail.com,f4fc229a-b573-4426-bbe9-3c698bc8d990,2026-10-25T20:17:27.020374+00:00
+
+--- 4. SPORT REGISTRATIONS ---
+Registration ID,Player Name,Player Email,Sport,Registration Status,Sync Status,Created At
+526e8a7e-b714-4af3-b932-cc181e7bb0cb,Devraj Mewada,devrajmewada80@gmail.com,Football,approved,synced,2026-10-25T19:53:19.993648+00:00
+f35e03bf-29c8-499b-b044-8ed472514bfd,Devraj Mewada,devrajmewada80@gmail.com,Cricket,approved,synced,2026-10-24T23:20:10.999098+00:00
+
+--- 5. TEAM JOIN REQUESTS ---
+Request ID,Team Name,Sport,Player Name,Player Email,Status,Player Message / Experience,Created At
+99e8a5f3-7e56-4c72-b566-82b76e71e273,money_heist,Cricket,Devraj Mewada,devrajmewada80@gmail.com,approved,"State Player , 5 year experience",2026-10-25T19:44:39.148348+00:00
+
+--- 6. SPORTS ---
+Sport ID,Sport Name,Description,Created At
+ed0ea86b-6378-49a4-aa49-1008201a5d07,Badminton,"Racquet sport, singles and doubles.",2026-10-24T23:01:27.442915+00:00
+b9218a60-1d23-476d-bf90-0769b5580bd9,Basketball,Five-a-side court game.,2026-10-24T23:01:27.442915+00:00
+a8574859-8cfe-472b-a347-d57e11464ef0,Cricket,Bat-and-ball team sport.,2026-10-24T23:01:27.442915+00:00
+34053ba1-6997-474a-8f1b-58069b7d35b8,Football,Association football.,2026-10-24T23:01:27.442915+00:00
+ec32dcd6-7d63-46c5-9b23-3968bad9ef9e,KHO-KHO,A nine player game from each side.,2026-10-24T23:15:42.691899+00:00
+f46a1053-f896-480d-944b-842d8b1b3417,Volleyball,Six-a-side net sport.,2026-10-24T23:01:27.442915+00:00

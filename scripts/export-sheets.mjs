@@ -196,6 +196,84 @@ async function exportAll() {
   ]);
   fs.writeFileSync(path.join(exportsDir, "matches.csv"), matchesCsv);
 
+  // 8. Master Combined "all_data.csv" (All project data in one single sheet)
+  const allDataRows = [
+    ["=== SPORTY MASTER DATA EXPORT ==="],
+    ["Exported At", new Date().toISOString()],
+    [],
+    ["--- 1. PLAYERS ---"],
+    ["Player ID", "Full Name", "Email", "Role", "Registered At"],
+    ...(playersRes.data || []).map((p) => [
+      p.id,
+      p.full_name,
+      p.email,
+      rolesMap[p.id] || "player",
+      p.created_at,
+    ]),
+    [],
+    ["--- 2. TEAMS ---"],
+    ["Team ID", "Team Name", "Sport", "Created At"],
+    ...(teamsRes.data || []).map((t) => [t.id, t.name, t.sport?.name || "", t.created_at]),
+    [],
+    ["--- 3. TEAM MEMBERS & ROSTERS ---"],
+    ["Team Name", "Sport", "Player Name", "Player Email", "Player ID", "Joined At"],
+    ...(membersRes.data || []).map((m) => [
+      m.team?.name || "",
+      m.team?.sport?.name || "",
+      m.player?.full_name || "",
+      m.player?.email || "",
+      m.player_id,
+      m.joined_at,
+    ]),
+    [],
+    ["--- 4. SPORT REGISTRATIONS ---"],
+    [
+      "Registration ID",
+      "Player Name",
+      "Player Email",
+      "Sport",
+      "Registration Status",
+      "Sync Status",
+      "Created At",
+    ],
+    ...(regsRes.data || []).map((r) => [
+      r.id,
+      r.player?.full_name || "",
+      r.player?.email || "",
+      r.sport?.name || "",
+      r.status,
+      r.sheets_sync_status,
+      r.created_at,
+    ]),
+    [],
+    ["--- 5. TEAM JOIN REQUESTS ---"],
+    [
+      "Request ID",
+      "Team Name",
+      "Sport",
+      "Player Name",
+      "Player Email",
+      "Status",
+      "Player Message / Experience",
+      "Created At",
+    ],
+    ...(reqsRes.data || []).map((q) => [
+      q.id,
+      q.team?.name || "",
+      q.team?.sport?.name || "",
+      q.player?.full_name || "",
+      q.player?.email || "",
+      q.status,
+      q.message || "",
+      q.created_at,
+    ]),
+    [],
+    ["--- 6. SPORTS ---"],
+    ["Sport ID", "Sport Name", "Description", "Created At"],
+    ...(sportsRes.data || []).map((s) => [s.id, s.name, s.description || "", s.created_at]),
+  ];
+  fs.writeFileSync(path.join(exportsDir, "all_data.csv"), toCsv(allDataRows));
+
   console.log("Successfully generated all CSVs in:", exportsDir);
   console.log(fs.readdirSync(exportsDir));
 }
