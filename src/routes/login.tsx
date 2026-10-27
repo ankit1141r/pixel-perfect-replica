@@ -3,7 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
-import { Eye, EyeOff, ShieldCheck } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -87,13 +87,6 @@ function Login() {
     navigate({ to: safeRedirect(redirect) });
   }
 
-  function fillAdminDemo() {
-    setEmailVal("ak1141");
-    setPasswordVal("Ankit@123");
-    setErrors({});
-    toast.success("Admin credentials filled! Click 'Sign in'.");
-  }
-
   return (
     <AuthCard
       title="Welcome back"
@@ -154,28 +147,6 @@ function Login() {
           {busy ? "Signing in…" : "Sign in"}
         </Button>
       </form>
-
-      {/* Quick Fill Admin Box */}
-      <div className="mt-4 rounded-xl border border-primary/30 bg-primary/10 p-3">
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 text-xs">
-            <ShieldCheck className="h-4 w-4 shrink-0 text-primary" />
-            <div>
-              <span className="font-semibold text-foreground">Admin Login: </span>
-              <span className="font-mono text-muted-foreground">ak1141 / Ankit@123</span>
-            </div>
-          </div>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="h-7 shrink-0 text-xs hover:bg-primary hover:text-primary-foreground transition-colors"
-            onClick={fillAdminDemo}
-          >
-            Auto Fill
-          </Button>
-        </div>
-      </div>
     </AuthCard>
   );
 }
