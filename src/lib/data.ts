@@ -127,6 +127,19 @@ export const myTeamJoinRequestsQuery = (userId: string) =>
       ),
   });
 
+export const allTeamMembersQuery = queryOptions({
+  queryKey: ["all-team-members"],
+  queryFn: async () =>
+    must(
+      await supabase
+        .from("team_members")
+        .select(
+          "*, team:teams(id, name, sport:sports(name)), player:profiles(id, full_name, email)",
+        )
+        .order("joined_at", { ascending: false }),
+    ),
+});
+
 export const activityQuery = queryOptions({
   queryKey: ["activity"],
   queryFn: async () =>

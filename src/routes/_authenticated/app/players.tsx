@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Search, Users } from "lucide-react";
 import { PageHeader, EmptyState } from "@/components/sporty/PageShell";
 import { Confirm, ErrorBox, Loading, Pager, paginate } from "@/components/sporty/bits";
+import { SheetsExportDialog } from "@/components/sporty/SheetsExportDialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -50,7 +51,11 @@ function Players() {
 
   return (
     <>
-      <PageHeader title="Players" subtitle="Everyone registered with the club." />
+      <PageHeader
+        title="Players"
+        subtitle="Everyone registered with the club."
+        action={<SheetsExportDialog />}
+      />
       <div className="relative mb-6 max-w-sm">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input

@@ -20,6 +20,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useMe } from "@/lib/auth";
 import { myTeamJoinRequestsQuery, myTeamsQuery, sportsQuery, teamsQuery } from "@/lib/data";
 import { TeamDialog } from "@/components/sporty/TeamDialog";
+import { SheetsExportDialog } from "@/components/sporty/SheetsExportDialog";
 
 export const Route = createFileRoute("/_authenticated/app/teams/")({
   validateSearch: z.object({ sport: z.string().optional() }),
@@ -75,9 +76,12 @@ function Teams() {
         subtitle="Squads across every sport."
         action={
           me?.isAdmin && (
-            <Button onClick={() => setEditing("new")}>
-              <Plus className="h-4 w-4" /> New team
-            </Button>
+            <div className="flex items-center gap-2">
+              <SheetsExportDialog />
+              <Button onClick={() => setEditing("new")}>
+                <Plus className="h-4 w-4" /> New team
+              </Button>
+            </div>
           )
         }
       />

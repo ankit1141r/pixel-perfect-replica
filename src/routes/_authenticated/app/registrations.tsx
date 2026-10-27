@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Check, ClipboardCheck, FileSpreadsheet, RotateCw, Shield, Users, X } from "lucide-react";
 import { PageHeader, EmptyState } from "@/components/sporty/PageShell";
 import { ErrorBox, Loading, Pager, paginate, RegBadge, SyncBadge } from "@/components/sporty/bits";
+import { SheetsExportDialog } from "@/components/sporty/SheetsExportDialog";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -131,11 +132,14 @@ function Registrations() {
         }
         action={
           me?.isAdmin ? (
-            <Button variant="outline" size="sm" onClick={syncAll} disabled={syncing}>
-              <RotateCw className={`h-4 w-4 ${syncing ? "animate-spin" : ""}`} />
-              <FileSpreadsheet className="h-4 w-4" />
-              {syncing ? "Syncing..." : "Sync Sheets"}
-            </Button>
+            <div className="flex items-center gap-2">
+              <SheetsExportDialog />
+              <Button variant="outline" size="sm" onClick={syncAll} disabled={syncing}>
+                <RotateCw className={`h-4 w-4 ${syncing ? "animate-spin" : ""}`} />
+                <FileSpreadsheet className="h-4 w-4" />
+                {syncing ? "Syncing..." : "Sync Sheets"}
+              </Button>
+            </div>
           ) : (
             <div className="flex gap-2">
               <Button asChild variant="outline">

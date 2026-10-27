@@ -4,6 +4,7 @@ import { Activity } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { PageHeader } from "@/components/sporty/PageShell";
 import { Card, ErrorBox, Loading } from "@/components/sporty/bits";
+import { SheetsExportDialog } from "@/components/sporty/SheetsExportDialog";
 import { requireAdmin } from "@/lib/guards";
 import {
   activityQuery,
@@ -77,7 +78,11 @@ function Reports() {
 
   return (
     <>
-      <PageHeader title="Reports" subtitle="Registration trends and club activity." />
+      <PageHeader
+        title="Reports"
+        subtitle="Registration trends and club activity."
+        action={<SheetsExportDialog />}
+      />
       <div className="mb-6 grid gap-4 sm:grid-cols-3">
         {(Object.entries(regTotals) as [keyof typeof regTotals, number][]).map(([k, v]) => (
           <div key={k} className="rounded-xl border bg-card p-5">

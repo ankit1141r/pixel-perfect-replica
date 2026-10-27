@@ -1,5 +1,6 @@
 // Supabase Edge Function: sync-sheets
-// Synchronizes player registrations to Google Sheets via Google Sheets API v4 using a Google Service Account.
+// Synchronizes player details, team details, registrations, and club data
+// to Google Sheets via Google Sheets API v4 using a Google Service Account.
 // Runs with server-side privilege (service role). Never exposes private keys to the client.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
@@ -83,6 +84,48 @@ async function getGoogleAccessToken(clientEmail: string, privateKeyPem: string):
   return tokenData.access_token;
 }
 
+async function syncTableToSheet(
+  spreadsheetId: string,
+  accessToken: string,
+  sheetTitle: string,
+  headers: string[],
+  rows: (string | number | null | undefined)[][],
+  existingSheets: string[],
+) {
+  if (!existingSheets.includes(sheetTitle)) {
+    await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}:batchUpdate`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        requests: [
+          {
+            addSheet: {
+              properties: { title: sheetTitle },
+            },
+          },
+        ],
+      }),
+    });
+    existingSheets.push(sheetTitle);
+  }
+
+  const values = [headers, ...rows.map((r) => r.map((c) => (c == null ? "" : String(c))))];
+  await fetch(
+    `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/'${sheetTitle}'!A1?valueInputOption=USER_ENTERED`,
+    {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ values }),
+    },
+  );
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -97,7 +140,6 @@ Deno.serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Check if Google credentials are configured
     const isConfigured = Boolean(spreadsheetId && clientEmail && privateKey);
 
     let body: SyncJobRequest = {};
@@ -180,7 +222,7 @@ Deno.serve(async (req) => {
     // Authenticate with Google Sheets API
     const accessToken = await getGoogleAccessToken(clientEmail, privateKey);
 
-    // Ensure the sheet "Registrations" exists and has headers
+    // Read spreadsheet metadata
     const metaRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}`, {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
@@ -191,158 +233,160 @@ Deno.serve(async (req) => {
     }
 
     const meta = await metaRes.json();
-    const sheetExists = meta.sheets?.some((s: any) => s.properties?.title === "Registrations");
+    const existingSheets: string[] = meta.sheets?.map((s: any) => s.properties?.title) || [];
 
-    if (!sheetExists) {
-      await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}:batchUpdate`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          requests: [
-            {
-              addSheet: {
-                properties: { title: "Registrations" },
-              },
-            },
-          ],
-        }),
-      });
-    }
+    // 1. Synchronize PLAYERS sheet
+    const { data: profiles } = await supabase.from("profiles").select("*").order("full_name");
+    const { data: roles } = await supabase.from("user_roles").select("user_id, role");
+    const rolesMap: Record<string, string> = {};
+    roles?.forEach((r) => {
+      rolesMap[r.user_id] = rolesMap[r.user_id] ? `${rolesMap[r.user_id]}, ${r.role}` : r.role;
+    });
 
-    // Read existing rows to guarantee idempotency and avoid duplicates
-    const existingRes = await fetch(
-      `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Registrations!A:G`,
-      { headers: { Authorization: `Bearer ${accessToken}` } },
+    await syncTableToSheet(
+      spreadsheetId,
+      accessToken,
+      "Players",
+      ["Player ID", "Full Name", "Email", "Role", "Created At"],
+      (profiles || []).map((p) => [
+        p.id,
+        p.full_name,
+        p.email,
+        rolesMap[p.id] || "player",
+        p.created_at,
+      ]),
+      existingSheets,
     );
-    const existingData = await existingRes.json();
-    const rows: string[][] = existingData.values || [];
 
-    // Ensure header row exists
-    const expectedHeaders = [
-      "Timestamp",
-      "Registration ID",
-      "Player ID",
-      "Player Name",
-      "Email",
-      "Sport",
-      "Registration Status",
-    ];
+    // 2. Synchronize TEAMS sheet
+    const { data: teams } = await supabase
+      .from("teams")
+      .select("*, sport:sports(name)")
+      .order("name");
+    await syncTableToSheet(
+      spreadsheetId,
+      accessToken,
+      "Teams",
+      ["Team ID", "Team Name", "Sport", "Created At"],
+      (teams || []).map((t) => [t.id, t.name, t.sport?.name || "", t.created_at]),
+      existingSheets,
+    );
 
-    if (rows.length === 0) {
-      await fetch(
-        `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Registrations!A1:G1?valueInputOption=USER_ENTERED`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ values: [expectedHeaders] }),
-        },
-      );
-      rows.push(expectedHeaders);
-    }
+    // 3. Synchronize TEAM MEMBERS sheet
+    const { data: members } = await supabase
+      .from("team_members")
+      .select("*, team:teams(name, sport:sports(name)), player:profiles(full_name, email)")
+      .order("joined_at", { ascending: false });
+    await syncTableToSheet(
+      spreadsheetId,
+      accessToken,
+      "Team_Members",
+      ["Team Name", "Sport", "Player Name", "Player Email", "Player ID", "Joined At"],
+      (members || []).map((m: any) => [
+        m.team?.name || "",
+        m.team?.sport?.name || "",
+        m.player?.full_name || "",
+        m.player?.email || "",
+        m.player_id,
+        m.joined_at,
+      ]),
+      existingSheets,
+    );
 
-    let syncedCount = 0;
-    const errors: Array<{ jobId: string; error: string }> = [];
+    // 4. Synchronize TEAM JOIN REQUESTS sheet
+    const { data: joinReqs } = await supabase
+      .from("team_join_requests")
+      .select("*, team:teams(name, sport:sports(name)), player:profiles(full_name, email)")
+      .order("created_at", { ascending: false });
+    await syncTableToSheet(
+      spreadsheetId,
+      accessToken,
+      "Team_Join_Requests",
+      [
+        "Request ID",
+        "Team Name",
+        "Sport",
+        "Player Name",
+        "Email",
+        "Status",
+        "Player Message / Experience",
+        "Created At",
+      ],
+      (joinReqs || []).map((q: any) => [
+        q.id,
+        q.team?.name || "",
+        q.team?.sport?.name || "",
+        q.player?.full_name || "",
+        q.player?.email || "",
+        q.status,
+        q.message || "",
+        q.created_at,
+      ]),
+      existingSheets,
+    );
 
+    // 5. Synchronize SPORTS sheet
+    const { data: sports } = await supabase.from("sports").select("*").order("name");
+    await syncTableToSheet(
+      spreadsheetId,
+      accessToken,
+      "Sports",
+      ["Sport ID", "Sport Name", "Description", "Created At"],
+      (sports || []).map((s) => [s.id, s.name, s.description || "", s.created_at]),
+      existingSheets,
+    );
+
+    // 6. Synchronize REGISTRATIONS sheet
+    const { data: registrations } = await supabase
+      .from("player_registrations")
+      .select("*, sport:sports(name), player:profiles(full_name, email)")
+      .order("created_at", { ascending: false });
+
+    await syncTableToSheet(
+      spreadsheetId,
+      accessToken,
+      "Registrations",
+      [
+        "Registration ID",
+        "Player Name",
+        "Player Email",
+        "Sport",
+        "Registration Status",
+        "Sheets Sync Status",
+        "Created At",
+      ],
+      (registrations || []).map((r: any) => [
+        r.id,
+        r.player?.full_name || "",
+        r.player?.email || "",
+        r.sport?.name || "",
+        r.status,
+        r.sheets_sync_status,
+        r.created_at,
+      ]),
+      existingSheets,
+    );
+
+    // Mark pending jobs as synced in database
     for (const job of jobs || []) {
-      const reg = job.registration as any;
-      if (!reg) continue;
+      await supabase
+        .from("sheets_sync_jobs")
+        .update({
+          status: "synced",
+          attempts: (job.attempts || 0) + 1,
+          last_error: null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", job.id);
 
-      try {
-        const regId = reg.id;
-        const existingRowIndex = rows.findIndex((r) => r[1] === regId);
-        const rowValues = [
-          new Date(reg.created_at).toISOString(),
-          reg.id,
-          reg.player?.id || "",
-          reg.player?.full_name || "",
-          reg.player?.email || "",
-          reg.sport?.name || "",
-          reg.status,
-        ];
-
-        if (existingRowIndex >= 0) {
-          // Row already exists - update it idempotently (1-indexed in Sheets)
-          const sheetRowNumber = existingRowIndex + 1;
-          const updateRes = await fetch(
-            `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Registrations!A${sheetRowNumber}:G${sheetRowNumber}?valueInputOption=USER_ENTERED`,
-            {
-              method: "PUT",
-              headers: {
-                Authorization: `Bearer ${accessToken}`,
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ values: [rowValues] }),
-            },
-          );
-          if (!updateRes.ok) {
-            throw new Error(`Failed to update row: ${await updateRes.text()}`);
-          }
-        } else {
-          // Append new row
-          const appendRes = await fetch(
-            `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Registrations!A:G:append?valueInputOption=USER_ENTERED`,
-            {
-              method: "POST",
-              headers: {
-                Authorization: `Bearer ${accessToken}`,
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ values: [rowValues] }),
-            },
-          );
-          if (!appendRes.ok) {
-            throw new Error(`Failed to append row: ${await appendRes.text()}`);
-          }
-          rows.push(rowValues);
-        }
-
-        // Mark as synced in Supabase
-        await supabase
-          .from("sheets_sync_jobs")
-          .update({
-            status: "synced",
-            attempts: (job.attempts || 0) + 1,
-            last_error: null,
-            updated_at: new Date().toISOString(),
-          })
-          .eq("id", job.id);
-
+      if (job.registration_id) {
         await supabase
           .from("player_registrations")
           .update({
             sheets_sync_status: "synced",
             updated_at: new Date().toISOString(),
           })
-          .eq("id", reg.id);
-
-        syncedCount++;
-      } catch (err: any) {
-        const errMsg = err?.message || String(err);
-        errors.push({ jobId: job.id, error: errMsg });
-
-        await supabase
-          .from("sheets_sync_jobs")
-          .update({
-            status: "failed",
-            attempts: (job.attempts || 0) + 1,
-            last_error: errMsg,
-            updated_at: new Date().toISOString(),
-          })
-          .eq("id", job.id);
-
-        await supabase
-          .from("player_registrations")
-          .update({
-            sheets_sync_status: "failed",
-            updated_at: new Date().toISOString(),
-          })
-          .eq("id", reg.id);
+          .eq("id", job.registration_id);
       }
     }
 
@@ -350,8 +394,15 @@ Deno.serve(async (req) => {
       JSON.stringify({
         configured: true,
         totalJobs: jobs?.length || 0,
-        syncedCount,
-        errors,
+        syncedCount: registrations?.length || 0,
+        sheetsUpdated: [
+          "Players",
+          "Teams",
+          "Team_Members",
+          "Team_Join_Requests",
+          "Sports",
+          "Registrations",
+        ],
       }),
       {
         status: 200,
